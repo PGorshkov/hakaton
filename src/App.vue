@@ -3,7 +3,6 @@
     <nav>
       <router-link to="/">Home</router-link> |
       <router-link to="/stats">Stats</router-link>
-      <router-link to="/maps">Maps</router-link>
       <r-button title="test"/>
     </nav>
     <router-view/>
