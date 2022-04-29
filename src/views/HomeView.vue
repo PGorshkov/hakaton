@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <DateRangePicker v-model="dateValue"/>
     <vue-tabs>
       <v-tab title="Список бригад">
         <vue-good-table
@@ -24,11 +25,16 @@
 <script>
 // @ is an alias to /src
 
+import DateRangePicker from '@/components/DateRangePicker'
+
 export default {
   name: 'HomeView',
-
+  components: {
+    DateRangePicker
+  },
   data () {
     return {
+      dateValue: null,
       teamColumns: [
         {
           label: '№ бригады',

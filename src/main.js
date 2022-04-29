@@ -9,8 +9,10 @@ import VueGoodTablePlugin from 'vue-good-table'
 import 'vue-good-table/dist/vue-good-table.css'
 import VueTabs from 'vue-nav-tabs'
 import 'vue-nav-tabs/themes/vue-tabs.css'
-
+import _ from 'lodash'
 import rir from './plugins/RirLib'
+
+window._ = _
 
 Vue.use(VueAxios, axios)
 Vue.use(VueGoodTablePlugin)
