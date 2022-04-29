@@ -9,12 +9,15 @@ export default {
   async mounted () {
     /*eslint-disable */
     await ymaps.ready(init)
+    const center = process.env.VUE_APP_BASE_SERVICE.split(',')
     function init () {
       this.ymaps = new ymaps.Map('map', {
-        center: [55.76, 37.64],
-        zoom: 7
+        center: center,
+        zoom: 10
       })
     }
+    const {data: { data: reactors}} = await this.axios.get(`${process.env.VUE_APP_SERVER}reactors`)
+    console.log(reactors)
   },
   data: () => ({
     ymaps: null
