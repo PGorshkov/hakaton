@@ -1,9 +1,8 @@
 <template>
-  <div id="app">
+  <div id="app" class="container mx-auto px-15">
     <nav>
       <router-link to="/">Сводная информация</router-link> |
       <router-link to="/maps">Карта</router-link>
-      <r-button title="test"/>
     </nav>
     <router-view/>
   </div>
