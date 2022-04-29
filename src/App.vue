@@ -1,32 +1,62 @@
 <template>
-  <div id="app" class="container mx-auto px-15">
-    <nav>
-      <router-link to="/">Сводная информация</router-link> |
-      <router-link to="/maps">Карта</router-link>
+  <div id="app" class="apps">
+    <nav class="px-6 py-8">
+      <div class="taleggio mb-6">Дашбоард</div>
+      <r-select
+        class="mb-5"
+        title="Бригады"
+        :items="brigades"
+        v-model="filter.brigades"
+        id-value="id"
+        title-value="name"
+      ></r-select>
+      <r-select
+        title="Бригады"
+        :items="reactors"
+        v-model="filter.reactors"
+        id-value="id"
+        title-value="name"
+      ></r-select>
     </nav>
-    <router-view/>
+    <router-view class="py-8 container"/>
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
+<script>
+import { mapActions, mapState } from 'vuex'
+export default {
+  async mounted () {
+    await this.getDirectory()
+    this.getLogs()
+  },
+  data: () => ({
+    filter: {
+      brigades: [],
+      reactors: []
     }
+  }),
+  computed: {
+    ...mapState('directory', ['brigades', 'reactors'])
+  },
+  methods: {
+    ...mapActions('logs', ['getLogs']),
+    ...mapActions('directory', ['getDirectory'])
+  }
+}
+</script>
+
+<style lang="scss">
+.apps{
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--rir-trainspotting);
+  & > nav {
+    flex: 0 0 344px;
+    background-color: var(--rir-amelie);
+  }
+  & > .container{
+    flex: 1 1 100%;
   }
 }
 </style>
