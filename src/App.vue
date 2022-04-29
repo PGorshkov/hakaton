@@ -21,7 +21,6 @@ import { mapActions, mapState } from 'vuex'
 export default {
   async mounted () {
     await this.getDirectory()
-    this.getLogs()
   },
   data: () => ({
     filter: {
@@ -32,7 +31,6 @@ export default {
     ...mapState('directory', ['brigades'])
   },
   methods: {
-    ...mapActions('logs', ['getLogs']),
     ...mapActions('directory', ['getDirectory'])
   }
 }

@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import DataBase from '@/components/modal/DataBase'
 import DataReactor from '@/components/modal/DataReactor'
 
@@ -20,28 +20,26 @@ export default {
   async mounted () {
     /*eslint-disable */
     await ymaps.ready(this.init)
+    await this.getLogs()
   },
   data: () => ({
     center: process.env.VUE_APP_BASE_SERVICE.split(','),
-    ymaps: null,
-    logs: [
-      {
-        brigadeId: 1,
-        reactor: 1,
-        startDate: 1651218756,
-        endDate: 1651218756,
-      }
-    ]
+    ymaps: null
   }),
   computed: {
     ...mapState('directory', ['reactors']),
+    ...mapState('logs', ['logs']),
   },
   watch: {
     reactors: function () {
       this.markerReactors()
+    },
+    logs: function () {
+      this.setRouterBrigade()
     }
   },
   methods: {
+    ...mapActions('logs', ['getLogs']),
     init () {
       this.ymaps = new ymaps.Map('map', {
         center: this.center,
@@ -57,7 +55,6 @@ export default {
       basePlacemark.events.add(['click'],  () => {
         this.openViewDataBase()
       })
-      this.setRouterBrigade()
     },
     markerReactors () {
       this.reactors.forEach(r => {
@@ -76,15 +73,28 @@ export default {
       })
     },
     async setRouterBrigade () {
+      // console.log('setRouterBrigade', this.logs)
       // const route = await ymaps.route([
       //   this.center,
       //   [this.reactors[1].longitude, this.reactors[1].latitude]
       // ])
+      // Object.keys(this.logs).forEach(async key => {
+      //
+      // })
+      const log = this.logs[1]
+      console.log('setRouterBrigade', [
+        log.steps[0],
+        log.steps[log.steps[0].length - 1]
+      ])
       const route = await new ymaps.multiRouter.MultiRoute({
         referencePoints: [
           [51.7292, 36.1944],
           [51.5036, 35.0848]
         ],
+        // referencePoints: [
+        //   log.steps[0],
+        //   log.steps[log.steps[0].length - 1]
+        // ],
         params: {
           results: 1
         }
@@ -92,11 +102,11 @@ export default {
         wayPointFinishIconLayout: null,
         wayPointStartIconLayout: null
       })
+      this.ymaps.geoObjects.add(route);
       // const points = route.getWayPoints()
       // const lastPoint = points.getLength() - 1;
       // points.get(0).properties.set('iconContent', null);
       // points.get(lastPoint).properties.set('iconContent', null);
-      this.ymaps.geoObjects.add(route);
       // for (var i = 0; i < route.getPaths().getLength(); i++) {
       //   const way = route.getPaths().get(i);
       //   const segments = way.getSegments();
