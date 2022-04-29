@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "@pg/vue-library": "git+ssh://git@gitlab.rusatom.dev/rosatom/core/design/library/vue-library.git#v0.5.3",
+    "babel-helper-vue-jsx-merge-props": "2.0.3",
     "axios": "^0.27.2",
     "core-js": "^3.22.3",
     "vue": "^2.6.14",
     "vue-axios": "^3.4.1",
     "vue-good-table": "^2.21.11",
+    "vue-nav-tabs": "^0.5.7",
     "vue-router": "^3.5.1",
     "vuex": "^3.6.2"
   },
