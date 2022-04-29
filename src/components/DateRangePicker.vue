@@ -1,5 +1,5 @@
 <template>
-  <date-picker :value="innerValue" @input="onInput" type="datetime" range :show-second="false" :minute-step="15" format="DD.MM.YYYY HH:mm" />
+  <date-picker :value="innerValue" @input="onInput" type="datetime" :show-second="false" :minute-step="15" format="DD.MM.YYYY HH:mm" />
 </template>
 <script>
 
@@ -12,7 +12,7 @@ export default {
   components: { DatePicker },
   props: {
     value: {
-      type: Array
+      type: [String, Date]
     }
   },
   data () {

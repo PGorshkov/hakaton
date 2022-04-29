@@ -1,5 +1,7 @@
 <template>
-  <div>{{ item }}</div>
+  <div>
+    <h1 class="header-2">{{ item.name }}</h1>
+  </div>
 </template>
 
 <script>

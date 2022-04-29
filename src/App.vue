@@ -11,6 +11,7 @@
         id-value="id"
         title-value="name"
       ></r-select>
+      <DateRangePicker v-model="dateValue"/>
     </nav>
     <router-view class="py-8 container"/>
   </div>
@@ -18,12 +19,15 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import DateRangePicker from '@/components/DateRangePicker'
 export default {
+  components: { DateRangePicker },
   async mounted () {
     await this.getDirectory()
     this.getLogs()
   },
   data: () => ({
+    dateValue: null,
     filter: {
       brigades: []
     }
