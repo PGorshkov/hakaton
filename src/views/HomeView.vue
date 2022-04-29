@@ -127,3 +127,10 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+  .header {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+</style>
