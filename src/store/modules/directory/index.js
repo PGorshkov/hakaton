@@ -9,7 +9,6 @@ export default {
     async getDirectory ({ commit }) {
       const { data: { data: reactors } } = await axios.get(`${process.env.VUE_APP_SERVER}reactors`)
       const { data: { data: brigades } } = await axios.get(`${process.env.VUE_APP_SERVER}brigades`)
-      console.log('logs', reactors, brigades)
       commit('setStateData', {
         reactors,
         brigades

@@ -1,5 +1,6 @@
 <template>
   <div id="app" class="apps">
+    <r-modal />
     <nav class="px-6 py-8">
       <div class="taleggio mb-6">Дашбоард</div>
       <r-select
@@ -7,13 +8,6 @@
         title="Бригады"
         :items="brigades"
         v-model="filter.brigades"
-        id-value="id"
-        title-value="name"
-      ></r-select>
-      <r-select
-        title="Бригады"
-        :items="reactors"
-        v-model="filter.reactors"
         id-value="id"
         title-value="name"
       ></r-select>
@@ -31,12 +25,11 @@ export default {
   },
   data: () => ({
     filter: {
-      brigades: [],
-      reactors: []
+      brigades: []
     }
   }),
   computed: {
-    ...mapState('directory', ['brigades', 'reactors'])
+    ...mapState('directory', ['brigades'])
   },
   methods: {
     ...mapActions('logs', ['getLogs']),

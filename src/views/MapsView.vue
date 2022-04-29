@@ -13,6 +13,8 @@
 
 <script>
 import { mapState } from 'vuex'
+import DataBase from '@/components/modal/DataBase'
+import DataReactor from '@/components/modal/DataReactor'
 
 export default {
   async mounted () {
@@ -43,26 +45,34 @@ export default {
     init () {
       this.ymaps = new ymaps.Map('map', {
         center: this.center,
-        zoom: 10
+        zoom: 8
+      })
+      const basePlacemark = new ymaps.Placemark(this.center, {}, {
+        preset: 'islands#redCircleDotIconWithCaption',
+        iconCaptionMaxWidth: '50'
       })
       this.ymaps
         .geoObjects
-        .add(new ymaps.Placemark(this.center, {}, {
-          preset: 'islands#redCircleDotIconWithCaption',
-          iconCaptionMaxWidth: '50'
-        }))
+        .add(basePlacemark)
+      basePlacemark.events.add(['click'],  () => {
+        this.openViewDataBase()
+      })
       this.setRouterBrigade()
     },
     markerReactors () {
       this.reactors.forEach(r => {
+        const basePlacemark = new ymaps.Placemark([r.longitude, r.latitude], {
+          iconCaption: `Р-${r.id}`
+        }, {
+          preset: 'islands#blueCircleDotIconWithCaption',
+          iconCaptionMaxWidth: '50'
+        })
         this.ymaps
           .geoObjects
-          .add(new ymaps.Placemark([r.longitude, r.latitude], {
-            iconCaption: `Р-${r.id}`
-          }, {
-            preset: 'islands#blueCircleDotIconWithCaption',
-            iconCaptionMaxWidth: '50'
-          }))
+          .add(basePlacemark)
+        basePlacemark.events.add(['click'],  () => {
+          this.openViewDataReactor(r)
+        })
       })
     },
     async setRouterBrigade () {
@@ -96,6 +106,14 @@ export default {
       //
       //   }
       // }
+    },
+    openViewDataBase () {
+      this.$rir.modal.open(DataBase, {})
+    },
+    openViewDataReactor (r) {
+      this.$rir.modal.open(DataReactor, {
+        item: r
+      })
     }
   }
 }
