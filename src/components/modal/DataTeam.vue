@@ -1,6 +1,10 @@
 <template>
   <div class="px-4">
     <h1 class="header">Информация по бригаде {{ item.name }}</h1>
+    <div>
+      <strong>Общее время простоя бригады: </strong>
+      <span>{{ formattedTeamDeadTime }}</span>
+    </div>
     <vue-good-table
       :columns="logColumns"
       :rows="teamWithLogs"/>
@@ -22,8 +26,24 @@ export default {
         .map(log => {
           const reactor = this.reactors.find(reactor => reactor.id === log.reactor_id)
           const incident = this.incidents.find(incident => incident.uuid === log.incident_uuid)
-          return { ...log, reactorName: reactor?.name || '-', incidentName: incident?.name || '-' }
+          return { ...log, reactorName: reactor?.name || '-', incidentId: incident?.uuid || '-' }
         })
+    },
+    teamDeadTime () {
+      const filteredByStatus = this.teamWithLogs.filter(team => team.status === 'task' || team.status === 'on_base')
+      return filteredByStatus.reduce((acc, curr, i, arr) => {
+        if (curr.status === 'on_base') {
+          if (arr[i + 1]) {
+            const timeDiff = arr[i + 1].starting_at - curr.starting_at
+            if (timeDiff) acc += timeDiff
+          }
+        }
+        return acc
+      }, 0)
+    },
+    formattedTeamDeadTime () {
+      if (!this.teamDeadTime) return '0ч.'
+      return `${window.dayjs.duration(this.teamDeadTime).asHours().toFixed(1)}ч.`
     }
   },
   props: {
@@ -37,17 +57,20 @@ export default {
         {
           label: 'Статус бригады',
           field: 'status_trans',
-          type: 'text'
+          type: 'text',
+          sortable: false
         },
         {
-          label: 'Заявка',
-          field: 'incidentName',
-          type: 'text'
+          label: 'Номер заявки',
+          field: 'incidentId',
+          type: 'text',
+          sortable: false
         },
         {
           label: 'Обслуженный реактор',
           field: 'reactorName',
-          type: 'text'
+          type: 'text',
+          sortable: false
         },
         {
           label: 'Начало работы',
@@ -55,7 +78,8 @@ export default {
           type: 'text',
           formatFn (v) {
             return window.dayjs(v).format('DD-MM-YYYY HH:mm')
-          }
+          },
+          sortable: false
         },
         {
           label: 'Конец работы',
@@ -63,7 +87,8 @@ export default {
           type: 'text',
           formatFn (v) {
             return window.dayjs(v).format('DD-MM-YYYY HH:mm')
-          }
+          },
+          sortable: false
         }
       ]
     }

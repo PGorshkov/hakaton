@@ -11,7 +11,7 @@
         id-value="id"
         title-value="name"
       ></r-select>
-      <DateRangePicker class="mb-6" v-model="filter.dateValue"/>
+      <DateRangePicker class="mb-6" v-model="filter.dateValue" @input="setSelectedTime($event)"/>
       <r-button
         @click="sendData"
         title="Применить"
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapMutations } from 'vuex'
 import DateRangePicker from '@/components/DateRangePicker'
 export default {
   components: { DateRangePicker },
@@ -61,6 +61,11 @@ export default {
     ...mapActions('directory', ['getDirectory']),
     ...mapActions('logs', ['getLogsMaps', 'getLogs']),
     ...mapActions('incidents', ['getIncidents']),
+    ...mapMutations('incidents', ['setSelectedTime']),
+    changeDateModel (val) {
+      const date = new Date(val)
+      this.filter.dateValue = date.getTime()
+    },
     async sendData () {
       await this.getLogsMaps(this.filter)
     },

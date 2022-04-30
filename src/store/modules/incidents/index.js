@@ -2,7 +2,8 @@ import axios from 'axios'
 export default {
   namespaced: true,
   state: {
-    incidents: []
+    incidents: [],
+    selectedTime: null
   },
   actions: {
     async getIncidents ({ commit }) {
@@ -13,6 +14,9 @@ export default {
     }
   },
   mutations: {
+    setSelectedTime (state, payload) {
+      state.selectedTime = payload ? window.dayjs(payload).valueOf() : 0
+    },
     setStateData (state, payload) {
       Object.keys(payload).forEach(key => {
         state[key] = payload[key]
