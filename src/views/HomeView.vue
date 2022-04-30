@@ -1,136 +1,130 @@
 <template>
-  <div class="home">
-    <DateRangePicker v-model="dateValue"/>
-    <vue-tabs>
-      <v-tab title="Список бригад">
-        <vue-good-table
-          :columns="teamColumns"
-          :rows="teamRows"/>
-      </v-tab>
-      <v-tab title="Сводная информация по всем бригадам">
-        <vue-good-table
-          :columns="totalColumns"
-          :rows="totalRows"/>
-      </v-tab>
-      <v-tab title="Сводная информация по заявкам">
-        <vue-good-table
-          :columns="requestColumns"
-          :rows="requestRows"/>
-      </v-tab>
-
-    </vue-tabs>
+  <div>
+    <r-row>
+      <r-col
+        :cols="{
+          widest: 12, wide: 12, middle: 6, narrow: 6,
+        }">
+        <div id="map" style="width: 100%; height: calc(100vh - 64px)"></div>
+      </r-col>
+    </r-row>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-
-import DateRangePicker from '@/components/DateRangePicker'
+import { mapActions, mapState } from 'vuex'
+import DataBase from '@/components/modal/DataBase'
+import DataReactor from '@/components/modal/DataReactor'
 
 export default {
-  name: 'HomeView',
-  components: {
-    DateRangePicker
+  async mounted () {
+    /*eslint-disable */
+    await ymaps.ready(this.init)
+    await this.getLogs()
   },
-  data () {
-    return {
-      dateValue: null,
-      teamColumns: [
-        {
-          label: '№ бригады',
-          field: 'number',
-          type: 'text'
-        },
-        {
-          label: 'Статус',
-          field: 'status',
-          type: 'text'
-        },
-        {
-          label: 'Простой',
-          field: 'downtime',
-          type: 'text'
-        },
-        {
-          label: 'Просрочка заявки',
-          field: 'expiredTime',
-          type: 'text'
-        },
-        {
-          label: 'Время выполнения заявок',
-          field: 'requestAverageTime',
-          type: 'text'
+  data: () => ({
+    center: process.env.VUE_APP_BASE_SERVICE.split(','),
+    ymaps: null
+  }),
+  computed: {
+    ...mapState('directory', ['reactors']),
+    ...mapState('logs', ['logs']),
+  },
+  watch: {
+    reactors: function () {
+      this.markerReactors()
+    },
+    logs: function () {
+      this.setRouterBrigade()
+    }
+  },
+  methods: {
+    ...mapActions('logs', ['getLogs']),
+    init () {
+      this.ymaps = new ymaps.Map('map', {
+        center: this.center,
+        zoom: 8
+      })
+      const basePlacemark = new ymaps.Placemark(this.center, {}, {
+        preset: 'islands#redCircleDotIconWithCaption',
+        iconCaptionMaxWidth: '50'
+      })
+      this.ymaps
+        .geoObjects
+        .add(basePlacemark)
+      basePlacemark.events.add(['click'],  () => {
+        this.openViewDataBase()
+      })
+    },
+    markerReactors () {
+      this.reactors.forEach(r => {
+        const basePlacemark = new ymaps.Placemark([r.longitude, r.latitude], {
+          iconCaption: `Р-${r.id}`
+        }, {
+          preset: 'islands#blueCircleDotIconWithCaption',
+          iconCaptionMaxWidth: '50'
+        })
+        this.ymaps
+          .geoObjects
+          .add(basePlacemark)
+        basePlacemark.events.add(['click'],  () => {
+          this.openViewDataReactor(r)
+        })
+      })
+    },
+    async setRouterBrigade () {
+      // console.log('setRouterBrigade', this.logs)
+      // const route = await ymaps.route([
+      //   this.center,
+      //   [this.reactors[1].longitude, this.reactors[1].latitude]
+      // ])
+      // Object.keys(this.logs).forEach(async key => {
+      //
+      // })
+      const log = this.logs[1]
+      console.log('setRouterBrigade', [
+        log.steps[0],
+        log.steps[log.steps[0].length - 1]
+      ])
+      const route = await new ymaps.multiRouter.MultiRoute({
+        referencePoints: [
+          [51.7292, 36.1944],
+          [51.5036, 35.0848]
+        ],
+        // referencePoints: [
+        //   log.steps[0],
+        //   log.steps[log.steps[0].length - 1]
+        // ],
+        params: {
+          results: 1
         }
-      ],
-      teamRows: [
-        { number: 1, status: 'В дороге', downtime: '4 часа', expiredTime: '', requestAverageTime: '2.5 часа' },
-        { number: 2, status: 'В работе', downtime: '4 часа', expiredTime: '4 часа', requestAverageTime: '2.5 часа' },
-        { number: 3, status: 'Свободна', downtime: '4 часа', expiredTime: '4 часа', requestAverageTime: '2.5 часа' },
-        { number: 4, status: 'В дороге', downtime: '4 часа', expiredTime: '4 часа', requestAverageTime: '2.5 часа' },
-        { number: 5, status: 'В дороге', downtime: '4 часа', expiredTime: '4 часа', requestAverageTime: '2.5 часа' },
-        { number: 6, status: 'Свободна', downtime: '4 часа', expiredTime: '4 часа', requestAverageTime: '2.5 часа' }
-      ],
-      totalColumns: [
-        {
-          label: 'Суммарное время простоя всех бригад',
-          field: 'totalDowntime',
-          type: 'text'
-        }, {
-          label: 'Cуммарное время просрочки',
-          field: 'totalExpiredTime',
-          type: 'text'
-        }, {
-          label: 'суммарное количество выполненных заявок со статусом просрочки',
-          field: 'totalCompletedRequests',
-          type: 'number'
-        }, {
-          label: 'Cреднее время выполнения заявки бригадами',
-          field: 'totalAverageRequestTime',
-          type: 'text'
-        }
-      ],
-      totalRows: [
-        { totalDowntime: '10ч', totalExpiredTime: '1ч', totalCompletedRequests: 10, totalAverageRequestTime: '2ч' },
-        { totalDowntime: '10ч', totalExpiredTime: '1ч', totalCompletedRequests: 10, totalAverageRequestTime: '2ч' },
-        { totalDowntime: '10ч', totalExpiredTime: '1ч', totalCompletedRequests: 10, totalAverageRequestTime: '2ч' },
-        { totalDowntime: '10ч', totalExpiredTime: '1ч', totalCompletedRequests: 10, totalAverageRequestTime: '2ч' },
-        { totalDowntime: '10ч', totalExpiredTime: '1ч', totalCompletedRequests: 10, totalAverageRequestTime: '2ч' }
-      ],
-      requestColumns: [
-        {
-          label: 'Номер заявки',
-          field: 'requestNumber',
-          type: 'text'
-        }, {
-          label: 'Бригада',
-          field: 'requestTeam',
-          type: 'text'
-        }, {
-          label: 'Статус',
-          field: 'requestStatus',
-          type: 'text'
-        },
-        {
-          label: 'Затраченное время',
-          field: 'completingTime',
-          type: 'text'
-        }
-      ],
-      requestRows: [
-        { requestNumber: '1', requestTeam: 'Бригада 1', requestStatus: 'Выполнено', completingTime: '4ч' },
-        { requestNumber: '2', requestTeam: 'Бригада 2', requestStatus: 'Выполнено', completingTime: '4ч' },
-        { requestNumber: '3', requestTeam: 'Бригада 4', requestStatus: 'Выполнено', completingTime: '4ч' },
-        { requestNumber: '4', requestTeam: 'Бригада 5', requestStatus: 'Выполнено', completingTime: '4ч' },
-        { requestNumber: '5', requestTeam: 'Бригада 4', requestStatus: 'Выполнено', completingTime: '4ч' }
-      ]
+      }, {
+        wayPointFinishIconLayout: null,
+        wayPointStartIconLayout: null
+      })
+      this.ymaps.geoObjects.add(route);
+      // const points = route.getWayPoints()
+      // const lastPoint = points.getLength() - 1;
+      // points.get(0).properties.set('iconContent', null);
+      // points.get(lastPoint).properties.set('iconContent', null);
+      // for (var i = 0; i < route.getPaths().getLength(); i++) {
+      //   const way = route.getPaths().get(i);
+      //   const segments = way.getSegments();
+      //   for (let j = 0; j < segments.length; j++) {
+      //     var street = segments[j].getCoordinates();
+      //     console.log(street);
+      //
+      //   }
+      // }
+    },
+    openViewDataBase () {
+      this.$rir.modal.open(DataBase, {})
+    },
+    openViewDataReactor (r) {
+      this.$rir.modal.open(DataReactor, {
+        item: r
+      })
     }
   }
 }
 </script>
-
-<style lang="scss">
-  .header {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
-</style>
