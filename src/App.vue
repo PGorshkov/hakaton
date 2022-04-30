@@ -28,6 +28,7 @@ export default {
   components: { DateRangePicker },
   async mounted () {
     await this.getDirectory()
+    await this.getIncidents()
   },
   data: () => ({
     filter: {
@@ -41,6 +42,7 @@ export default {
   methods: {
     ...mapActions('directory', ['getDirectory']),
     ...mapActions('logs', ['getLogsMaps']),
+    ...mapActions('incidents', ['getIncidents']),
     changeDateModel (val) {
       const date = new Date(val)
       this.filter.dateValue = date.getTime()
