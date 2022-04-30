@@ -28,7 +28,7 @@ export default {
     ymaps: null
   }),
   computed: {
-    ...mapState('directory', ['reactors']),
+    ...mapState('directory', ['reactors', 'brigades']),
     ...mapState('logs', ['logsMap'])
   },
   watch: {
@@ -77,6 +77,7 @@ export default {
     },
     async setRouterBrigade () {
       for(let l of this.logsMap) {
+        const brigade = this.brigades.find(br => br.id === l.brigada_id)
         const route = await new ymaps.multiRouter.MultiRoute({
           referencePoints: [
             l.routes[0].points,
@@ -87,14 +88,17 @@ export default {
           }
         }, {
           wayPointFinishIconLayout: null,
-          wayPointStartIconLayout: null
+          wayPointStartIconLayout: null,
+          routeStrokeColor: brigade.color.line,
+          routeActiveStrokeColor: brigade.color.line,
+          pinIconFillColor: brigade.color.line,
         })
         const Position =  l.routes.find(el => el.isPosition)
         if (Position) {
           const brigadePlacemark = new ymaps.Placemark(Position.points, {
             iconCaption: `Б-${l.brigada_id}`
           }, {
-            preset: 'islands#orangeCircleDotIconWithCaption',
+            preset: `islands#${brigade.color.baloon}CircleDotIcon`,
             iconCaptionMaxWidth: '50'
           })
           this.ymaps.geoObjects.add(brigadePlacemark);

@@ -16,7 +16,7 @@
         :cols="{
           widest: 3, wide: 3, middle: 1, narrow: 1,
         }">
-        Статус пути
+        Статус
       </r-col>
       <r-col
         :cols="{
@@ -40,7 +40,7 @@
         {{ item.incident_uuid }}
       </r-col>
     </r-row>
-    <r-row class="mb-6">
+    <r-row class="mb-6" v-if="item.status !== 'work'">
       <r-col
         class="bryndza"
         :cols="{
@@ -76,7 +76,7 @@
         :cols="{
           widest: 3, wide: 3, middle: 1, narrow: 1,
         }">
-        Время выезда
+        Время начала
       </r-col>
       <r-col
         :cols="{
@@ -91,7 +91,7 @@
         :cols="{
           widest: 3, wide: 3, middle: 1, narrow: 1,
         }">
-        Время примерного приезда
+        Время примерного окончания
       </r-col>
       <r-col
         :cols="{
