@@ -15,7 +15,6 @@
 import { mapActions, mapState } from 'vuex'
 import DataBase from '@/components/modal/DataBase'
 import DataReactor from '@/components/modal/DataReactor'
-import getTimeInMeters from '@/utils/getTimeInMeters'
 
 export default {
   async mounted () {
@@ -29,42 +28,14 @@ export default {
   }),
   computed: {
     ...mapState('directory', ['reactors']),
-    ...mapState('logs', ['logs']),
-    logsData () {
-      return this.logs
-        .filter(el => ['on_road'].includes(el.status))
-        .map(el => {
-          el.routes = el.routes.reduce((acc, r, index) => {
-            const startDate = index === 0 ? el.starting_at : acc[index - 1].endDate
-            const endDate = startDate + getTimeInMeters(parseFloat(r.distance))
-            acc.push({
-              dist: r.distance,
-              startDate,
-              endDate,
-              points: [r.longitude, r.latitude]
-            })
-            return acc
-          }, [])
-          return el
-        })
-    }
+    ...mapState('logs', ['logsMap'])
   },
   watch: {
-    reactors: function () {
-      this.markerReactors()
-    },
-    logsData: function () {
-      console.log(this.ymaps)
-      this.setRouterBrigade()
-    }
-  },
-  methods: {
-    ...mapActions('logs', ['getLogsMaps']),
-    init () {
-      this.ymaps = new ymaps.Map('map', {
-        center: this.center,
-        zoom: 8
-      })
+    // reactors: function () {
+    //   this.markerReactors()
+    // },
+    logsMap: function () {
+      this.ymaps.geoObjects.removeAll()
       const basePlacemark = new ymaps.Placemark(this.center, {}, {
         preset: 'islands#redCircleDotIconWithCaption',
         iconCaptionMaxWidth: '50'
@@ -74,6 +45,17 @@ export default {
         .add(basePlacemark)
       basePlacemark.events.add(['click'],  () => {
         this.openViewDataBase()
+      })
+      this.markerReactors()
+      this.setRouterBrigade()
+    }
+  },
+  methods: {
+    ...mapActions('logs', ['getLogsMaps']),
+    init () {
+      this.ymaps = new ymaps.Map('map', {
+        center: this.center,
+        zoom: 8
       })
     },
     markerReactors () {
@@ -93,7 +75,7 @@ export default {
       })
     },
     async setRouterBrigade () {
-      for(let l of this.logsData) {
+      for(let l of this.logsMap) {
         const route = await new ymaps.multiRouter.MultiRoute({
           referencePoints: [
             l.routes[0].points,

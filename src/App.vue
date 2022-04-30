@@ -11,7 +11,7 @@
         id-value="id"
         title-value="name"
       ></r-select>
-      <DateRangePicker class="mb-6" @input="changeDateModel"/>
+      <DateRangePicker class="mb-6" v-model="filter.dateValue"/>
       <r-button
         @click="sendData"
         title="Применить"
@@ -41,10 +41,6 @@ export default {
   methods: {
     ...mapActions('directory', ['getDirectory']),
     ...mapActions('logs', ['getLogsMaps']),
-    changeDateModel (val) {
-      const date = new Date(val)
-      this.filter.dateValue = date.getTime()
-    },
     async sendData () {
       await this.getLogsMaps(this.filter)
     }
