@@ -53,6 +53,15 @@ export default {
         },
         tdClass: vm.tdClassFunc,
         sortable: false
+      },
+      {
+        label: 'Время работы',
+        field: 'hour',
+        type: 'text',
+        formatFn (v) {
+          return Math.floor(v / (1000 * 60 * 60)) + ':' + Math.floor(v / (1000 * 60)) % 60 + ':' + Math.floor(v / 1000) % 60
+        },
+        sortable: false
       }
     ]
   }),
@@ -72,7 +81,7 @@ export default {
           const count = window.dayjs.duration(check).asHours().toFixed(2)
           return {
             ...el,
-            hour: count,
+            hour: check,
             isSla: count < 4
           }
         })

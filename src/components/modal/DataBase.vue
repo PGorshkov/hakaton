@@ -41,7 +41,7 @@ export default {
             const check = window.dayjs(el.completed_at).diff(end)
             const count = window.dayjs.duration(check).asHours().toFixed(2)
             if (count > 4) {
-              acc += (count - 4).toFixed(2)
+              acc += check - 14400000
             }
           }
           return acc
@@ -83,7 +83,10 @@ export default {
         {
           label: 'Время просрочки',
           field: 'incedentsHoursBreak',
-          type: 'text'
+          type: 'text',
+          formatFn (v) {
+            return Math.floor(v / (1000 * 60 * 60)) + ':' + Math.floor(v / (1000 * 60)) % 60 + ':' + Math.floor(v / 1000) % 60
+          }
         }
       ]
     }
