@@ -35,13 +35,20 @@ export default {
           return acc
         }, 0)
         incident = _.compact(_.uniq(incident))
+        let countSuccess = 0
+        let countFail = 0
+        let hourTask = 0
         const incedentsHoursBreak = this.incidents.reduce((acc, el) => {
           if (incident.includes(el.uuid)) {
             const end = window.dayjs(el.discovered_at)
             const check = window.dayjs(el.completed_at).diff(end)
             const count = window.dayjs.duration(check).asHours().toFixed(2)
+            hourTask += check
             if (count > 4) {
               acc += check - 14400000
+              countFail += 1
+            } else {
+              countSuccess += 1
             }
           }
           return acc
@@ -57,7 +64,7 @@ export default {
           }
           return acc
         }, 0)
-
+        const hourDiff = hourTask / (countSuccess + countFail)
         return {
           brigadeName: foundBrigade?.name || '-',
           id: foundBrigade?.id,
@@ -65,7 +72,8 @@ export default {
           brigadeStatus: foundStatus?.status_trans || 'на базе',
           totalDistance: parseInt(totalDistance) + 'м.',
           incedentsHoursBreak,
-          incidentCount: _.compact(_.uniqBy(v, 'incident_uuid'))?.length,
+          incidentCount: `${countSuccess} / (${countFail})`,
+          hourTask: `${Math.floor(hourDiff / (1000 * 60 * 60)) + ':' + Math.floor(hourDiff / (1000 * 60)) % 60 + ':' + Math.floor(hourDiff / 1000) % 60}ч.`,
           teamDeadTime: sum ? `${Math.floor(sum / (1000 * 60 * 60)) + ':' + Math.floor(sum / (1000 * 60)) % 60 + ':' + Math.floor(sum / 1000) % 60}ч.` : '0ч.'
         }
       }).value()
@@ -110,6 +118,11 @@ export default {
         {
           label: 'Количество заявок',
           field: 'incidentCount',
+          type: 'text'
+        },
+        {
+          label: 'Среднее время работы',
+          field: 'hourTask',
           type: 'text'
         }
       ]
