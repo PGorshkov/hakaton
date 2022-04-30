@@ -46,6 +46,7 @@ export default {
     await this.getDirectory()
     await this.getIncidents()
     await this.getLogs()
+    await this.getLogsMaps()
   },
   data: () => ({
     filter: {

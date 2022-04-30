@@ -21,7 +21,6 @@ export default {
   async mounted () {
     /*eslint-disable */
     await ymaps.ready(this.init)
-    await this.getLogsMaps()
   },
   data: () => ({
     center: process.env.VUE_APP_BASE_SERVICE.split(','),
