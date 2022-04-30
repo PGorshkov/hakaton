@@ -3,51 +3,47 @@
     <h1 class="header">Список бригад</h1>
     <vue-good-table
       :columns="teamColumns"
-      :rows="teamRows"/>
+      @on-row-click="showTeamInfo"
+      :rows="brigades"/>
   </div>
 
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
+import DataTeam from '@/components/modal/DataTeam'
 export default {
   name: 'data-base',
+  computed: {
+    ...mapState('directory', ['brigades'])
+  },
   data () {
     return {
       teamColumns: [
         {
           label: '№ бригады',
-          field: 'number',
+          field: 'id',
           type: 'text'
         },
         {
-          label: 'Статус',
-          field: 'status',
+          label: 'Название бригады',
+          field: 'name',
           type: 'text'
         },
         {
-          label: 'Простой',
-          field: 'downtime',
-          type: 'text'
-        },
-        {
-          label: 'Просрочка заявки',
-          field: 'expiredTime',
-          type: 'text'
-        },
-        {
-          label: 'Время выполнения заявок',
-          field: 'requestAverageTime',
+          label: 'Статус бригады',
+          field: 'status_trans',
           type: 'text'
         }
-      ],
-      teamRows: [
-        { number: 1, status: 'В дороге', downtime: '4 часа', expiredTime: '', requestAverageTime: '2.5 часа' },
-        { number: 2, status: 'В работе', downtime: '4 часа', expiredTime: '4 часа', requestAverageTime: '2.5 часа' },
-        { number: 3, status: 'Свободна', downtime: '4 часа', expiredTime: '4 часа', requestAverageTime: '2.5 часа' },
-        { number: 4, status: 'В дороге', downtime: '4 часа', expiredTime: '4 часа', requestAverageTime: '2.5 часа' },
-        { number: 5, status: 'В дороге', downtime: '4 часа', expiredTime: '4 часа', requestAverageTime: '2.5 часа' },
-        { number: 6, status: 'Свободна', downtime: '4 часа', expiredTime: '4 часа', requestAverageTime: '2.5 часа' }
       ]
+    }
+  },
+  methods: {
+    showTeamInfo (tableData) {
+      this.$rir.modal.open(DataTeam, {
+        item: tableData.row
+      })
     }
   }
 }

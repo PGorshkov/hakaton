@@ -11,8 +11,10 @@ import VueTabs from 'vue-nav-tabs'
 import 'vue-nav-tabs/themes/vue-tabs.css'
 import _ from 'lodash'
 import rir from './plugins/RirLib'
+import dayjs from 'dayjs'
 
 window._ = _
+window.dayjs = dayjs
 
 Vue.use(VueAxios, axios)
 Vue.use(VueGoodTablePlugin)
