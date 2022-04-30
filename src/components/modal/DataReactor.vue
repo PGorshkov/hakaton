@@ -69,7 +69,7 @@ export default {
         .map(el => {
           const end = window.dayjs(el.discovered_at)
           const check = window.dayjs(el.completed_at).diff(end)
-          const count = Math.round(window.dayjs.duration(check).asHours())
+          const count = window.dayjs.duration(check).asHours().toFixed(2)
           return {
             ...el,
             hour: count,

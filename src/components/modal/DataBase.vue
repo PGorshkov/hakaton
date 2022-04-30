@@ -18,22 +18,42 @@ export default {
   name: 'data-base',
   computed: {
     ...mapState('directory', ['brigades']),
-    ...mapState('incidents', ['selectedTime']),
+    ...mapState('incidents', ['selectedTime', 'incidents']),
     ...mapState('logs', ['logs']),
     formattedBrigades () {
       return _(this.logs).groupBy('brigada_id').values().map((v, k) => {
         const foundBrigade = _.find(this.brigades, { id: v[0].brigada_id })
-
         const foundStatus = v.find(el => {
           return !!window.dayjs(this.selectedTime).isBetween(el.starting_at, el.ending_at)
         })
+        let incident = []
         const totalDistance = v.reduce((acc, curr) => {
+          incident.push(curr.incident_uuid)
           if (curr.distance) {
             acc += parseFloat(curr.distance)
           }
           return acc
         }, 0)
-        return { brigadeName: foundBrigade?.name || '-', id: foundBrigade?.id, teamData: v, brigadeStatus: foundStatus?.status_trans || 'на базе', totalDistance: parseInt(totalDistance) + 'м.' }
+        incident = _.compact(_.uniq(incident))
+        const incedentsHoursBreak = this.incidents.reduce((acc, el) => {
+          if (incident.includes(el.uuid)) {
+            const end = window.dayjs(el.discovered_at)
+            const check = window.dayjs(el.completed_at).diff(end)
+            const count = window.dayjs.duration(check).asHours().toFixed(2)
+            if (count > 4) {
+              acc += (count - 4).toFixed(2)
+            }
+          }
+          return acc
+        }, 0)
+        return {
+          brigadeName: foundBrigade?.name || '-',
+          id: foundBrigade?.id,
+          teamData: v,
+          brigadeStatus: foundStatus?.status_trans || 'на базе',
+          totalDistance: parseInt(totalDistance) + 'м.',
+          incedentsHoursBreak
+        }
       }).value()
     }
   },
@@ -58,6 +78,11 @@ export default {
         {
           label: 'Общее расстояние',
           field: 'totalDistance',
+          type: 'text'
+        },
+        {
+          label: 'Время просрочки',
+          field: 'incedentsHoursBreak',
           type: 'text'
         }
       ]
