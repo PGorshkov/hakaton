@@ -15,12 +15,13 @@
 import { mapActions, mapState } from 'vuex'
 import DataBase from '@/components/modal/DataBase'
 import DataReactor from '@/components/modal/DataReactor'
+import getTimeInMeters from '@/utils/getTimeInMeters'
 
 export default {
   async mounted () {
     /*eslint-disable */
     await ymaps.ready(this.init)
-    await this.getLogs()
+    await this.getLogsMaps()
   },
   data: () => ({
     center: process.env.VUE_APP_BASE_SERVICE.split(','),
@@ -29,17 +30,36 @@ export default {
   computed: {
     ...mapState('directory', ['reactors']),
     ...mapState('logs', ['logs']),
+    logsData () {
+      return this.logs
+        .filter(el => ['on_road'].includes(el.status))
+        .map(el => {
+          el.routes = el.routes.reduce((acc, r, index) => {
+            const startDate = index === 0 ? el.starting_at : acc[index - 1].endDate
+            const endDate = startDate + getTimeInMeters(parseFloat(r.distance))
+            acc.push({
+              dist: r.distance,
+              startDate,
+              endDate,
+              points: [r.longitude, r.latitude]
+            })
+            return acc
+          }, [])
+          return el
+        })
+    }
   },
   watch: {
     reactors: function () {
       this.markerReactors()
     },
-    logs: function () {
+    logsData: function () {
+      console.log(this.ymaps)
       this.setRouterBrigade()
     }
   },
   methods: {
-    ...mapActions('logs', ['getLogs']),
+    ...mapActions('logs', ['getLogsMaps']),
     init () {
       this.ymaps = new ymaps.Map('map', {
         center: this.center,
@@ -73,53 +93,21 @@ export default {
       })
     },
     async setRouterBrigade () {
-      // console.log('setRouterBrigade', this.logs)
-      // const route = await ymaps.route([
-      //   this.center,
-      //   [this.reactors[1].longitude, this.reactors[1].latitude]
-      // ])
-      // Object.keys(this.logs).forEach(async key => {
-      //
-      // })
-      const log = this.logs[1].steps[2]
-      console.log(log)
-      // console.log('setRouterBrigade', JSON.stringify([
-      //   log.steps[0],
-      //   log.steps[log.steps[0].length - 1]
-      // ]))
-      const route = await new ymaps.multiRouter.MultiRoute({
-        referencePoints: [
-          log[0],
-          log[log.length - 1],
-          // [51.729284, 36.194391],
-          // [51.5036, 35.0848],
-          // [51.65873766, 37.45489353]
-        ],
-        // referencePoints: [
-        //   log.steps[0],
-        //   log.steps[log.steps[0].length - 1]
-        // ],
-        params: {
-          results: 1
-        }
-      }, {
-        wayPointFinishIconLayout: null,
-        wayPointStartIconLayout: null
-      })
-      this.ymaps.geoObjects.add(route);
-      // const points = route.getWayPoints()
-      // const lastPoint = points.getLength() - 1;
-      // points.get(0).properties.set('iconContent', null);
-      // points.get(lastPoint).properties.set('iconContent', null);
-      // for (var i = 0; i < route.getPaths().getLength(); i++) {
-      //   const way = route.getPaths().get(i);
-      //   const segments = way.getSegments();
-      //   for (let j = 0; j < segments.length; j++) {
-      //     var street = segments[j].getCoordinates();
-      //     console.log(street);
-      //
-      //   }
-      // }
+      for(let l of this.logsData) {
+        const route = await new ymaps.multiRouter.MultiRoute({
+          referencePoints: [
+            l.routes[0].points,
+            l.routes[l.routes.length - 1].points
+          ],
+          params: {
+            results: 1
+          }
+        }, {
+          wayPointFinishIconLayout: null,
+          wayPointStartIconLayout: null
+        })
+        this.ymaps.geoObjects.add(route);
+      }
     },
     openViewDataBase () {
       this.$rir.modal.open(DataBase, {})

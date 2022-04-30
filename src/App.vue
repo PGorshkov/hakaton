@@ -5,13 +5,17 @@
       <div class="taleggio mb-6">Дашбоард</div>
       <r-select
         class="mb-5"
-        title="Бригады"
+        label ="Бригады"
         :items="brigades"
         v-model="filter.brigades"
         id-value="id"
         title-value="name"
       ></r-select>
-      <DateRangePicker v-model="dateValue"/>
+      <DateRangePicker class="mb-6" @input="changeDateModel"/>
+      <r-button
+        @click="sendData"
+        title="Применить"
+      />
     </nav>
     <router-view class="py-8 container"/>
   </div>
@@ -26,16 +30,24 @@ export default {
     await this.getDirectory()
   },
   data: () => ({
-    dateValue: null,
     filter: {
-      brigades: []
+      brigades: [],
+      dateValue: null
     }
   }),
   computed: {
     ...mapState('directory', ['brigades'])
   },
   methods: {
-    ...mapActions('directory', ['getDirectory'])
+    ...mapActions('directory', ['getDirectory']),
+    ...mapActions('logs', ['getLogsMaps']),
+    changeDateModel (val) {
+      const date = new Date(val)
+      this.filter.dateValue = date.getTime()
+    },
+    async sendData () {
+      await this.getLogsMaps(this.filter)
+    }
   }
 }
 </script>

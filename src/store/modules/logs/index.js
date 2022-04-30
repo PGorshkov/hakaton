@@ -3,7 +3,8 @@ import axios from 'axios'
 export default {
   namespaced: true,
   state: {
-    logs: {}
+    logs: [],
+    logsMap: []
   },
   actions: {
     async getLogs ({ commit }) {
@@ -32,11 +33,29 @@ export default {
       //   return acc
       // }, {})
       commit('setLogs', logs)
+    },
+    async getLogsMaps ({ commit }, payload) {
+      const { data: { data: logs } } = await axios.get(`${process.env.VUE_APP_SERVER}logs/brigades`)
+      let dataLog = logs
+      if (payload?.brigades.length) {
+        dataLog = dataLog.filter(el => {
+          return payload.brigades.includes(el.brigada_id)
+        })
+      }
+      if (payload?.dateValue) {
+        dataLog = dataLog.filter(el => {
+          return el.ending_at > payload.dateValue > el.starting_at
+        })
+      }
+      commit('setLogs', dataLog)
     }
   },
   mutations: {
     setLogs (state, payload) {
       state.logs = payload
+    },
+    setLogsMap (state, payload) {
+      state.logsMap = payload
     }
   }
 }
