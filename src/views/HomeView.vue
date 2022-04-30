@@ -81,15 +81,19 @@ export default {
       // Object.keys(this.logs).forEach(async key => {
       //
       // })
-      const log = this.logs[1]
-      console.log('setRouterBrigade', [
-        log.steps[0],
-        log.steps[log.steps[0].length - 1]
-      ])
+      const log = this.logs[1].steps[2]
+      console.log(log)
+      // console.log('setRouterBrigade', JSON.stringify([
+      //   log.steps[0],
+      //   log.steps[log.steps[0].length - 1]
+      // ]))
       const route = await new ymaps.multiRouter.MultiRoute({
         referencePoints: [
-          [51.7292, 36.1944],
-          [51.5036, 35.0848]
+          log[0],
+          log[log.length - 1],
+          // [51.729284, 36.194391],
+          // [51.5036, 35.0848],
+          // [51.65873766, 37.45489353]
         ],
         // referencePoints: [
         //   log.steps[0],

@@ -14,11 +14,16 @@ export default {
           acc[el.brigada_id] = {
             brigadeColor: '#FFFFFF',
             brigadeName: 'Бригада',
-            steps: []
+            steps: {}
           }
         }
+
+        if (!acc[el.brigada_id].steps[el.log_id]) {
+          acc[el.brigada_id].steps[el.log_id] = []
+        }
+
         // [el.longitude, el.latitude]
-        acc[el.brigada_id].steps.push([el.longitude, el.latitude])
+        acc[el.brigada_id].steps[el.log_id].push([parseFloat(el.longitude), parseFloat(el.latitude)])
         return acc
       }, {})
       commit('setLogs', logsData)
