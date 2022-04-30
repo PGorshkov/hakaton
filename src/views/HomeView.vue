@@ -15,6 +15,7 @@
 import { mapActions, mapState } from 'vuex'
 import DataBase from '@/components/modal/DataBase'
 import DataReactor from '@/components/modal/DataReactor'
+import DataRoadBrigade from '@/components/modal/DataRoadBrigade'
 
 export default {
   async mounted () {
@@ -88,6 +89,21 @@ export default {
           wayPointFinishIconLayout: null,
           wayPointStartIconLayout: null
         })
+        const Position =  l.routes.find(el => el.isPosition)
+        if (Position) {
+          console.log(Position)
+          const brigadePlacemark = new ymaps.Placemark(Position.points, {
+            iconCaption: `Б-${l.brigada_id}`
+          }, {
+            preset: 'islands#blueCircleDotIconWithCaption',
+            iconCaptionMaxWidth: '50'
+          })
+          this.ymaps.geoObjects.add(brigadePlacemark);
+
+          brigadePlacemark.events.add(['click'],  () => {
+            this.openViewDataBrigade(l)
+          })
+        }
         this.ymaps.geoObjects.add(route);
       }
     },
@@ -97,6 +113,11 @@ export default {
     openViewDataReactor (r) {
       this.$rir.modal.open(DataReactor, {
         item: r
+      })
+    },
+    openViewDataBrigade (l) {
+      this.$rir.modal.open(DataRoadBrigade, {
+        item: l
       })
     }
   }

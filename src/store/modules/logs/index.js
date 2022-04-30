@@ -33,7 +33,7 @@ export default {
           let isPosition = false
           if (payload?.dateValue) {
             const date = new Date(payload.dateValue).getTime()
-            isPosition = payload?.dateValue && r.starting_at < date && date < r.ending_at
+            isPosition = startDate < date && date < endDate
           }
 
           acc.push({
