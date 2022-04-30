@@ -16,11 +16,13 @@ export default {
   computed: {
     ...mapState('directory', ['reactors']),
     ...mapState('logs', ['logs']),
+    ...mapState('incidents', ['incidents']),
     teamWithLogs () {
       return this.logs.filter(log => log.brigada_id === this.item.id)
         .map(log => {
-          const reactor = this.reactors.find(reactor => reactor.id === log.id)
-          return { ...log, reactorName: reactor.name }
+          const reactor = this.reactors.find(reactor => reactor.id === log.reactor_id)
+          const incident = this.incidents.find(incident => incident.uuid === log.incident_uuid)
+          return { ...log, reactorName: reactor?.name || '-', incidentName: incident?.name || '-' }
         })
     }
   },
@@ -38,6 +40,11 @@ export default {
           type: 'text'
         },
         {
+          label: 'Заявка',
+          field: 'incidentName',
+          type: 'text'
+        },
+        {
           label: 'Обслуженный реактор',
           field: 'reactorName',
           type: 'text'
@@ -51,8 +58,8 @@ export default {
           }
         },
         {
-          label: 'Начало работы',
-          field: 'starting_at',
+          label: 'Конец работы',
+          field: 'ending_at',
           type: 'text',
           formatFn (v) {
             return window.dayjs(v).format('DD-MM-YYYY HH:mm')

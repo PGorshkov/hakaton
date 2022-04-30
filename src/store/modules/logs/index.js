@@ -30,8 +30,11 @@ export default {
         el.routes = el.routes.reduce((acc, r, index) => {
           const startDate = index === 0 ? el.starting_at : acc[index - 1].endDate
           const endDate = startDate + getTimeInMeters(parseFloat(r.distance))
-          const date = new Date(payload.dateValue).getTime()
-          const isPosition = payload?.dateValue && r.starting_at < date && date < r.ending_at
+          let isPosition = false
+          if (payload?.dateValue) {
+            const date = new Date(payload.dateValue).getTime()
+            isPosition = payload?.dateValue && r.starting_at < date && date < r.ending_at
+          }
 
           acc.push({
             dist: r.distance,
