@@ -31,9 +31,9 @@ export default {
     ...mapState('logs', ['logsMap'])
   },
   watch: {
-    // reactors: function () {
-    //   this.markerReactors()
-    // },
+    reactors: function () {
+      this.markerReactors()
+    },
     logsMap: function () {
       this.ymaps.geoObjects.removeAll()
       const basePlacemark = new ymaps.Placemark(this.center, {}, {
@@ -56,6 +56,17 @@ export default {
       this.ymaps = new ymaps.Map('map', {
         center: this.center,
         zoom: 8
+      })
+      this.ymaps.geoObjects.removeAll()
+      const basePlacemark = new ymaps.Placemark(this.center, {}, {
+        preset: 'islands#redCircleDotIconWithCaption',
+        iconCaptionMaxWidth: '50'
+      })
+      this.ymaps
+        .geoObjects
+        .add(basePlacemark)
+      basePlacemark.events.add(['click'],  () => {
+        this.openViewDataBase()
       })
     },
     markerReactors () {
