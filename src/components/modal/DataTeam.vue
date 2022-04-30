@@ -86,7 +86,7 @@ export default {
           field: 'ending_at',
           type: 'text',
           formatFn (v) {
-            return window.dayjs(v).format('DD-MM-YYYY HH:mm')
+            return v ? window.dayjs(v).format('DD-MM-YYYY HH:mm') : '-'
           },
           sortable: false
         }
