@@ -91,11 +91,10 @@ export default {
         })
         const Position =  l.routes.find(el => el.isPosition)
         if (Position) {
-          console.log(Position)
           const brigadePlacemark = new ymaps.Placemark(Position.points, {
             iconCaption: `Б-${l.brigada_id}`
           }, {
-            preset: 'islands#blueCircleDotIconWithCaption',
+            preset: 'islands#orangeCircleDotIconWithCaption',
             iconCaptionMaxWidth: '50'
           })
           this.ymaps.geoObjects.add(brigadePlacemark);

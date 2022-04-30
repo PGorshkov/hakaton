@@ -15,7 +15,23 @@
       <r-button
         @click="sendData"
         title="Применить"
+        class="mb-6"
       />
+      <div style="display: flex;">
+
+        <r-button
+          :disabled="!filter.dateValue || !!this.live"
+          class="mr-6"
+          @click="sendLive"
+          title="Лайв режим"
+        />
+        <r-button
+          @click="stopLive"
+          color="fargo"
+          title="Стоп"
+          :disabled="!this.live"
+        />
+      </div>
     </nav>
     <router-view class="py-8 container"/>
   </div>
@@ -35,7 +51,8 @@ export default {
     filter: {
       brigades: [],
       dateValue: null
-    }
+    },
+    live: null
   }),
   computed: {
     ...mapState('directory', ['brigades'])
@@ -44,12 +61,18 @@ export default {
     ...mapActions('directory', ['getDirectory']),
     ...mapActions('logs', ['getLogsMaps', 'getLogs']),
     ...mapActions('incidents', ['getIncidents']),
-    changeDateModel (val) {
-      const date = new Date(val)
-      this.filter.dateValue = date.getTime()
-    },
     async sendData () {
       await this.getLogsMaps(this.filter)
+    },
+    async sendLive () {
+      this.live = setInterval(async () => {
+        this.filter.dateValue = new Date(new Date(this.filter.dateValue).getTime() + 900000)
+        await this.getLogsMaps(this.filter)
+      }, 3000)
+    },
+    async stopLive () {
+      clearInterval(this.live)
+      this.live = null
     }
   }
 }
