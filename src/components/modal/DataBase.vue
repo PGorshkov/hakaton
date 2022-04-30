@@ -46,13 +46,27 @@ export default {
           }
           return acc
         }, 0)
+
+        const filteredByStatus = _.compact(_.uniqBy(v, 'incident_uuid')).filter(v => v.status === 'task' || v.status === 'on_base')
+        const sum = filteredByStatus.reduce((acc, curr, i, arr) => {
+          if (curr.status === 'on_base') {
+            if (arr[i + 1]) {
+              const timeDiff = arr[i + 1].starting_at - curr.starting_at
+              if (timeDiff) acc += timeDiff
+            }
+          }
+          return acc
+        }, 0)
+
         return {
           brigadeName: foundBrigade?.name || '-',
           id: foundBrigade?.id,
           teamData: v,
           brigadeStatus: foundStatus?.status_trans || 'на базе',
           totalDistance: parseInt(totalDistance) + 'м.',
-          incedentsHoursBreak
+          incedentsHoursBreak,
+          incidentCount: _.compact(_.uniqBy(v, 'incident_uuid'))?.length,
+          teamDeadTime: sum ? `${Math.floor(sum / (1000 * 60 * 60)) + ':' + Math.floor(sum / (1000 * 60)) % 60 + ':' + Math.floor(sum / 1000) % 60}ч.` : '0ч.'
         }
       }).value()
     }
@@ -87,6 +101,16 @@ export default {
           formatFn (v) {
             return Math.floor(v / (1000 * 60 * 60)) + ':' + Math.floor(v / (1000 * 60)) % 60 + ':' + Math.floor(v / 1000) % 60
           }
+        },
+        {
+          label: 'Общее время простоя',
+          field: 'teamDeadTime',
+          type: 'text'
+        },
+        {
+          label: 'Количество заявок',
+          field: 'incidentCount',
+          type: 'text'
         }
       ]
     }

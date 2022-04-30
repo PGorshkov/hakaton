@@ -14,6 +14,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import _ from 'lodash'
 
 export default {
   name: 'DataTeam',
@@ -30,7 +31,7 @@ export default {
         })
     },
     teamDeadTime () {
-      const filteredByStatus = this.teamWithLogs.filter(team => team.status === 'task' || team.status === 'on_base')
+      const filteredByStatus = _.compact(_.uniqBy(this.teamWithLogs, 'incident_uuid')).filter(team => team.status === 'task' || team.status === 'on_base')
       return filteredByStatus.reduce((acc, curr, i, arr) => {
         if (curr.status === 'on_base') {
           if (arr[i + 1]) {
@@ -43,7 +44,7 @@ export default {
     },
     formattedTeamDeadTime () {
       if (!this.teamDeadTime) return '0ч.'
-      return `${window.dayjs.duration(this.teamDeadTime).asHours().toFixed(1)}ч.`
+      return `${this.teamDeadTime ? `${Math.floor(this.teamDeadTime / (1000 * 60 * 60)) + ':' + Math.floor(this.teamDeadTime / (1000 * 60)) % 60 + ':' + Math.floor(this.teamDeadTime / 1000) % 60}ч.` : '0ч.'}`
     }
   },
   props: {
